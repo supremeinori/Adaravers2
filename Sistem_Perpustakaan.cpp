@@ -13,12 +13,12 @@ struct Buku {
 };
 /*Catatan : Fitur yang belum 
 1.Hapus Data (V)
-2.Tambahkan Ke file riwayat untuk implementasi append
-3.Sorting by A-Z, Z-A, Tahun, Genre lagi (V) 
+3.Sorting by A-Z, Z-A, Tahun, Genre (V) 
+2.Tambahkan Ke file riwayat untuk implementasi append (V)
 4.Tambah File Riwayat Penambahan / Pengurangan Buku 
 5. Berarti ada 3 File :
-   1.Nyimpen Buku (w)
-   2.Nyimpen Riwayat Peminjaman (a)
+   1.Nyimpen Buku (w) (V)
+   2.Nyimpen Riwayat Peminjaman (a) (V)
    3.Nyimpen Riwayat penambahan/pengurangan buku (a)*/
 struct nodebuku
 {
@@ -41,6 +41,11 @@ void stop(){
     cout << "Press any key to continue...";
     cin.get(); // Ini yang bikin program nunggu user tekan tombol
 }
+
+const char* databuku = "perpustakaan.dat";
+const char* RB = "riwayatbuku.dat";
+const char* RP = "riwayatpeminjaman.dat";
+
 nodebuku* head = NULL;
 nodebuku* tail = NULL;
 int jumlahbuku = 0;
@@ -60,6 +65,23 @@ nodebuku* tambahbuku(Buku bukubaru){
     jumlahbuku ++;
 };
 
+struct riwayat{
+    char aksi[20];
+    char isbn[20];
+    char peminjaman[50];
+    char timestamp[30];
+};
+struct buku
+{
+    char aksi[20];
+    char isbn[20];
+    char judul[50];
+    char timestamp[30];
+};
+
+
+
+
 int hitungbuku(){
     
     int count = 0;
@@ -73,12 +95,21 @@ int hitungbuku(){
 };
 
 int pagesize=5;
-void savetofile();
-void readfromfile();
-void showbuku();
+
+
+// perfilean
+void savetofile();  void readfromfile(); // Data Buku
+void saveriwayat(const char* aksi, const char* isbn, const char* peminjam); void readriwayat();  // Data Riwayat
+void savebuku(const char* aksi, const char* isbn, const char* judul); void readbuku();  // Data penambahan dan pengurangan buku
+
+
+//tampilan
+void showbuku(); 
 void tampilpaging(int hal);
 void pilihgenre(char* genre);
 nodebuku* cariisbn(char isbn);
+
+//Sorting dan searching
 void pinjamBuku(); void pengembalianbuku(); void sortby(); 
 void hapus(char* isbn); void search(); void hapusbuku();void sortBukuAZ(); void sortbukuZA();
 nodebuku* carijudul(char* isbn); void sorttahun1(); void sorttahun2();
@@ -101,7 +132,7 @@ int main (){
     case 1:
         int pil1;
         do
-        {   
+        {    
             clearScreen();
         cout << "PEMINJAMAN" << endl; //Menu Peminjaman
         cout << "1.Tampilkan Buku" << endl; //Tampil buku ada sort, search, paging,
@@ -171,7 +202,9 @@ int main (){
             pengembalianbuku();
             break;
         case 4:
-            cout << "Masih Proses" << endl;
+            readriwayat();
+            cin.ignore();
+            stop();
             break;
         case 0:
             cout << "Masih Proses" << endl;
@@ -221,7 +254,9 @@ int main (){
                 pilihgenre(BB.genre);
                 cout << "Masukkan Tahun Terbit : " ; cin >> BB.tahun; cin.ignore();
                 BB.status = false;
+                savebuku("Tambah", BB.isbn, BB.judul);
                 tambahbuku(BB);
+
             }
             cout << "Buku Berhasil ditambahkan" << endl;
             stop();
@@ -231,7 +266,8 @@ int main (){
             stop();
             break;
         case 3:
-        cout << "Masih proses" << endl;
+        readbuku();
+        cin.ignore();
         stop();
         case 0:
             /* code */
@@ -409,14 +445,8 @@ void pinjamBuku() {
         cout << "Selamat Membaca Kak " << namaPeminjam << endl;
     };
     
-    // Riwayat riwayat;
-    // strcpy(riwayat.isbn, isbn);
-    // strcpy(riwayat.namaPeminjam, namaPeminjam);
-    // strcpy(riwayat.tanggalPinjam, getCurrentDate().c_str());
-    // strcpy(riwayat.tanggalKembali, "");
-    
-    // tambahRiwayat(riwayat);
-    // cout << "Buku berhasil dipinjam!" << endl;
+    saveriwayat("PINJAM", isbn, namaPeminjam);
+    cout << "Buku berhasil dipinjam!" << endl;
 }
 
 void pengembalianbuku(){
@@ -447,7 +477,7 @@ void pengembalianbuku(){
         cout << "Buku Berhasil Dikembalikan" << endl;
         cout << "Terimakasih kak" << namaPeminjam << endl;
     }          
-
+    saveriwayat("KEMBALI", isbn, namaPeminjam);  // Tambahkan ini
 }
 
 
@@ -541,7 +571,7 @@ void search(){
 }
 
 void savetofile() {
-    FILE* file = fopen("perpustakaan.dat", "wb");
+    FILE* file = fopen(databuku, "wb");
     if (file == NULL) {
         cout << "Gagal membuka file untuk penyimpanan!" << endl;
         return;
@@ -558,7 +588,7 @@ void savetofile() {
 }
 
 void readfromfile() {
-    FILE* file = fopen("perpustakaan.dat", "rb");
+    FILE* file = fopen(databuku, "rb");
     if (file == NULL) {
         cout << "File tidak ditemukan, menggunakan data dummy..." << endl;
         isiDummy(); // Gunakan data dummy jika file tidak ada
@@ -592,7 +622,7 @@ void hapusbuku() {
     cout << "Masukkan ISBN buku yang ingin dihapus: ";
     cin.ignore();  // Bersihkan newline sebelumnya
     cin.getline(isbn, 10);
-
+    
     nodebuku* buku = cariisbn(isbn);
     if (buku == NULL) {
         cout << "Buku dengan ISBN " << isbn << " tidak ditemukan!" << endl;
@@ -617,6 +647,8 @@ void hapusbuku() {
         buku->prev->next = buku->next;
         buku->next->prev = buku->prev;
     }
+       
+    savebuku("Hapus", isbn, buku->data.judul);
 
     delete buku;
     jumlahbuku--;
@@ -841,5 +873,97 @@ void sortby(){
     default:
         break;
     }
+
+}
+
+
+void saveriwayat(const char* aksi, const char* isbn, const char* peminjam){
+    FILE* file = fopen(RP, "ab");
+        if (file == NULL)
+        {
+            cout << "gagal membuka file riwayat peminjaman" << endl;
+            return;
+        }
+        
+        riwayat r ;
+
+        //timestamp;
+        time_t now = time(0);
+        strftime(r.timestamp, sizeof(r.timestamp), "%Y-%m-%d %H:%M:%S", localtime(&now));
+
+        //isi data pengguna
+        strncpy(r.aksi, aksi, sizeof(r.aksi));
+        strncpy(r.isbn, isbn, sizeof(r.isbn));
+        strncpy(r.peminjaman, peminjam, sizeof(r.peminjaman));
+
+        fwrite(&r, sizeof(r), 1, file); 
+
+    fclose(file);
+    cout <<"Riwayat berhasil ditambahkan";
+}
+
+void readriwayat() {
+    FILE* file = fopen(RP, "rb");
+    if (file == NULL) {
+        cout << "Belum ada riwayat peminjaman.\n";
+        return;
+    }
+
+    riwayat r;
+    bool data = false;
+    cout << "=== Daftar Riwayat Peminjaman ===" << endl;
+
+    while (fread(&r, sizeof(r), 1, file) == 1) {
+        data = true;
+        cout << "Timestamp  : " << r.timestamp << "  Aksi       : " << "["<< r.aksi << "]" <<"  ISBN       : " << r.isbn << "   Peminjam   : " << r.peminjaman << endl;
+        cout << "------------------------------------------" << endl;
+    }
+
+    if(data == false){
+        cout << "Belum ada Data" << endl;
+    }
+
+
+    fclose(file);
+}
+
+void savebuku(const char* aksi, const char* isbn, const char* judul){
+    FILE* file = fopen(RB, "ab");   
+        if (file == NULL)
+        {
+            cout << "gagal membuka file"<< endl;
+        }
+        
+        buku b;
+
+        time_t now = time(0);
+        strftime(b.timestamp, sizeof(b.timestamp), "%Y-%m-%d %H:%M:%S", localtime(&now));
+        strncpy(b.aksi, aksi, sizeof(b.aksi));
+        strncpy(b.isbn, isbn, sizeof(b.isbn));
+        strncpy(b.judul, judul, sizeof(b.judul));
+        
+        fwrite(&b,sizeof(b), 1, file);
+
+    fclose(file);
+
+}
+
+void readbuku(){
+    FILE * file = fopen(RB, "rb");
+        if (file == NULL)
+        {
+            cout << "gagal membuka file"<< endl;
+        }
+        buku b;
+
+        while (fread(&b, sizeof(b), 1, file) == 1)
+        {
+            cout << b.timestamp << " " << b.aksi << " " << b.isbn << " " << b.judul << endl;
+            cout << "---------------------------------------------------------"<< endl;
+        }
+        
+
+    fclose(file);
+
 
 }
