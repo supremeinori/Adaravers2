@@ -57,12 +57,14 @@ nodebuku* tambahbuku(Buku bukubaru){
     {
         head = newnode;
         tail = newnode;
+        return newnode;
     } else {
         tail->next= newnode; // point dari tail ke newnode
         newnode->prev = tail; // newnode ke tail
         tail = newnode;
     }
     jumlahbuku ++;
+    return newnode;
 };
 
 struct riwayat{
