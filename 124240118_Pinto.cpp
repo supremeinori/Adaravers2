@@ -6,7 +6,7 @@ using namespace std;
 typedef struct 
 {
     char nama [40];
-    char nim  [5];
+    char nim  [9];
     float ipk ;
 } mhs;
 
@@ -17,16 +17,16 @@ void pause(){
 }
 
 mhs m[10]{
-    {"Senku Ishigami", "1001", 3.91},
-    {"Taiju Oki", "1002", 3.52},
-    {"Yuzuriha Ogawa", "1003", 3.73},
-    {"Tsukasa Shishio", "1004", 3.84},
-    {"Gen Asagiri", "1005", 3.67},
-    {"Chrome", "1006", 3.21},
-    {"Kohaku", "1007", 3.45},
-    {"Ruri", "1008", 3.16},
-    {"Ukyo Saionji", "1009", 3.34},
-    {"Ryusui Nanami", "1010", 3.09}
+    {"Senku Ishigami", "10000001", 3.91},
+    {"Taiju Oki", "10000002", 3.52},
+    {"Yuzuriha Ogawa", "10000003", 3.73},
+    {"Tsukasa Shishio", "10000004", 3.84},
+    {"Gen Asagiri", "10000005", 3.67},
+    {"Chrome", "10000006", 3.21},
+    {"Kohaku", "10000007", 3.45},
+    {"Ruri", "10000008", 3.16},
+    {"Ukyo Saionji", "10000009", 3.34},
+    {"Ryusui Nanami", "10000010", 3.09}
 };
 
 void ss(char nim[], int size);
