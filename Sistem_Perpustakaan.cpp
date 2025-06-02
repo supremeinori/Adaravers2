@@ -230,39 +230,56 @@ int main (){
         cout << "0.Kembali Ke Menu Utama" << endl;
         cout << "Masukkan Pilihan : "; cin >> pil2;
         switch (pil2)
+            {
+case 1:
+    int byk;
+    cout << "Masukkan Jumlah Buku yang Ingin Di tambahkan : "; cin >> byk; cin.ignore();
+    for (int i = 0; i < byk; i++)
+    {   
+        Buku BB;
+        if (jumlahbuku >= 100)
         {
-        case 1:
-            int byk;
-            cout << "Masukkan Jumlah Buku yang Ingin Di tambahkan : "; cin >> byk; cin.ignore();
-            for (int i = 0; i < byk; i++)
-            {   
-
-                Buku BB;
-                if (jumlahbuku >= 100)
-                {
-                    cout << "Kapasitas Penyimanan Penuh" << endl;
+            cout << "Kapasitas Penyimanan Penuh" << endl;
+            break;
+        }
+        
+        if (byk==1)
+        {
+            cout << "Tambahkan Buku" << endl;
+        } else {
+            cout << "Tambahkan Buku Ke-" << i+1 <<endl; 
+        }
+        
+        
+        bool isbnExists;
+        do {
+            isbnExists = false;
+            cout << "Masukkan ISBN : "; 
+            cin.getline(BB.isbn, 10);
+            
+        
+            nodebuku* current = head;
+            while (current != NULL) {
+                if (strcmp(current->data.isbn, BB.isbn) == 0) {
+                    isbnExists = true;
+                    cout << "ISBN sudah ada! Masukkan ISBN yang berbeda." << endl;
                     break;
                 }
-        
-                if (byk==1)
-                {
-                    cout << "Tambahkan Buku" << endl;
-                } else {
-                cout << "Tambahkan Buku Ke-" << i+1 <<endl; 
-                }
-                cout << "Masukkan Judul Buku : " ; cin.getline(BB.judul, 100); 
-                cout << "Masukkan Pengarang : " ; cin.getline(BB.pengarang, 100); 
-                cout << "Masukkan ISBN : " ; cin.getline(BB.isbn, 10);
-                pilihgenre(BB.genre);
-                cout << "Masukkan Tahun Terbit : " ; cin >> BB.tahun; cin.ignore();
-                BB.status = false;
-                savebuku("Tambah", BB.isbn, BB.judul);
-                tambahbuku(BB);
-
+                current = current->next;
             }
-            cout << "Buku Berhasil ditambahkan" << endl;
-            stop();
-            break;
+        } while (isbnExists);
+        
+        cout << "Masukkan Judul Buku : "; cin.getline(BB.judul, 100); 
+        cout << "Masukkan Pengarang : "; cin.getline(BB.pengarang, 100); 
+        pilihgenre(BB.genre);
+        cout << "Masukkan Tahun Terbit : "; cin >> BB.tahun; cin.ignore();
+        BB.status = false;
+        savebuku("Tambah", BB.isbn, BB.judul);
+        tambahbuku(BB);
+    }
+    cout << "Buku Berhasil ditambahkan" << endl;
+    stop();
+    break;
         case 2:
             hapusbuku();
             stop();
